@@ -1,1 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>نظامي اليومي</title>
 
+<!-- PWA / Add to Home Screen -->
+<meta name="theme-color" content="#1D9E75">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نظامي اليومي">
+<link rel="manifest" id="manifestLink">
+<link rel="apple-touch-icon" id="appleIcon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --font-sans: "Cairo", "Segoe UI", system-ui, sans-serif;
+  --surface-1: #FFFFFF;
+  --surface-2: #F7F7F8;
+  --border: #E3E3E6;
+  --radius: 8px;
+  --text-primary: #1A1A1E;
+  --text-secondary: #4A4A52;
+  --text-muted: #8A8A93;
+  --page-bg: #EFEFF2;
+  --accent-green: #1D9E75;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--page-bg);font-family:var(--font-sans)}
+body{padding:1.25rem 1rem 2.5rem;max-width:760px;margin:0 auto;padding-top:max(1.25rem, env(safe-area-inset-top));padding-bottom:max(2.5rem, env(safe-area-inset-bottom))}
+.wrap{padding:.25rem 0;font-family:var(--font-sans)}
+.block{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;transition:opacity .2s}
+.block.done{opacity:.55}
+.bhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.time{font-size:12px;font-weight:500;padding:3px 10px;border-radius:var(--radius);white-space:nowrap}
+.t-blue{background:#E6F1FB;color:#0C447C}
+.t-green{background:#EAF3DE;color:#27500A}
+.t-purple{background:#EEEDFE;color:#3C3489}
+.t-amber{background:#FAEEDA;color:#633806}
+.t-red{background:#FCEBEB;color:#791F1F}
+.t-teal{background:#E1F5EE;color:#085041}
+.btitle{font-size:14px;font-weight:500;color:var(--text-primary)}
+.bsub{font-size:12px;color:var(--text-muted)}
+.row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px;color:var(--text-primary);line-height:1.5;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.row:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.db{background:#185FA5}.dg{background:#1D9E75}.da{background:#BA7517}.dp{background:#534AB7}.dr{background:#A32D2D}.dt{background:#0F6E56}
+.highlight{background:var(--surface-1);border-left:3px solid #534AB7;border-radius:0 var(--radius) var(--radius) 0;padding:.6rem 1rem;margin-top:8px;font-size:12px;color:var(--text-secondary);line-height:1.6}
+.highlight-green{background:var(--surface-1);border-left:3px solid #1D9E75;border-radius:0 var(--radius) var(--radius) 0;padding:.6rem 1rem;margin-top:8px;font-size:12px;color:var(--text-secondary);line-height:1.6}
+.note{font-size:12px;color:var(--text-muted);padding:.4rem 0;line-height:1.6;font-style:italic}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+html[dir="rtl"] .highlight,
+html[dir="rtl"] .highlight-green{
+  border-left:none;
+  border-right:3px solid #534AB7;
+  border-radius:var(--radius) 0 0 var(--radius);
+}
+html[dir="rtl"] .highlight-green{border-right-color:#1D9E75}
+
+.chk{width:18px;height:18px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--surface-1);transition:background .15s,border-color .15s}
+.chk svg{width:11px;height:11px;opacity:0;transition:opacity .15s}
+.row.checked .chk{background:var(--accent-green);border-color:var(--accent-green)}
+.row.checked .chk svg{opacity:1}
+.row.checked span.label{color:var(--text-muted);text-decoration:line-through}
+
+.progress-wrap{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:14px;position:sticky;top:max(10px, env(safe-area-inset-top));z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.progress-title{font-size:14px;font-weight:600;color:var(--text-primary)}
+.progress-date{font-size:11px;color:var(--text-muted);display:block;margin-top:2px}
+.progress-count{font-size:13px;color:var(--text-muted)}
+.bar-track{height:8px;background:var(--border);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent-green);border-radius:6px;width:0%;transition:width .25s}
+
+.close-block{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;margin-top:6px}
+.close-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.close-msg{font-size:13px;color:var(--text-secondary);line-height:1.7}
+.fail-rule{background:var(--surface-1);border-right:3px solid #A32D2D;border-radius:var(--radius) 0 0 var(--radius);padding:.6rem 1rem;margin-top:10px;font-size:12px;color:var(--text-secondary);line-height:1.7}
+
+.install-banner{display:none;background:#0F1115;color:#fff;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:14px;font-size:12.5px;line-height:1.7;align-items:center;gap:10px}
+.install-banner.show{display:flex}
+.install-banner button{background:var(--accent-green);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.install-banner .ib-close{background:transparent;color:#9aa0a6;padding:6px;font-size:14px}
+
+.reset-note{font-size:11px;color:var(--text-muted);text-align:center;margin-top:14px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="install-banner" id="installBanner">
+  <span id="installText">📲 ثبّت هذا كتطبيق على شاشتك الرئيسية لتفتحه كأي تطبيق آخر</span>
+  <button id="installBtn">تثبيت</button>
+  <button class="ib-close" id="installClose">✕</button>
+</div>
+
+<div class="wrap">
+<h2 class="sr-only">نظامي اليومي — القرآن أولاً</h2>
+
+<div class="progress-wrap">
+  <div class="progress-top">
+    <div>
+      <span class="progress-title">تقدّم اليوم</span>
+      <span class="progress-date" id="todayDate"></span>
+    </div>
+    <span class="progress-count" id="progressCount">0 / 0 مهمة</span>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="progressBar"></div></div>
+</div>
+
+<div class="note">⏱ مدة لكل مهمة بدل وقت بداية ثابت. تبدأ من 8:00، وكل مهمة تأخذ مدتها ثم تنتقل للتي بعدها. اضغط على أي سطر لتأشيره — كل المهام تُصفَّر تلقائياً مع كل يوم جديد، بلا أي زر تضغطه.</div>
+
+<div class="block" data-block="1">
+  <div class="bhead"><span class="time t-green">60 دقيقة</span><span class="btitle">الانطلاقة</span><span class="bsub">شحن الجسم · تبدأ ~8:00</span></div>
+  <div class="row" data-task="t1"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">استيقاظ + كوب ماء فوراً — لا هاتف أول 30 دقيقة</span></div>
+  <div class="row" data-task="t2"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">صلاة الصبح + وضوء + ذكر قصير</span></div>
+  <div class="row" data-task="t3"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">رياضة خفيفة — مشي أو تمارين في المنزل</span></div>
+</div>
+
+<div class="block" data-block="2">
+  <div class="bhead"><span class="time t-purple">60 دقيقة</span><span class="btitle">القرآن — حفظ ومراجعة</span><span class="bsub">أول شيء قبل أي مهمة</span></div>
+  <div class="row" data-task="t4"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">حفظ الجزء الجديد من البقرة — 30 دقيقة (~5 آيات)</span></div>
+  <div class="row" data-task="t5"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">مراجعة ما حفظته أمس وهذا الأسبوع — 20 دقيقة</span></div>
+  <div class="row" data-task="t6"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">اسمع الآية 5 مرات → اقرأها بصوت عالٍ 10 مرات → احفظها بلا نظر</span></div>
+  <div class="highlight">الذهن بعد الاستيقاظ مباشرة هو أنقى وقت للحفظ — قبل أن تدخل أي معلومة أخرى</div>
+</div>
+
+<div class="block" data-block="3">
+  <div class="bhead"><span class="time t-blue">45 دقيقة</span><span class="btitle">قراءة استراتيجية</span><span class="bsub">$100M Offers / Leads</span></div>
+  <div class="row" data-task="t7"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">45 دقيقة قراءة مركزة مع تدوين ملاحظات تطبيقية على MentionCatch</span></div>
+  <div class="row" data-task="t8"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">سؤال واحد قبل البدء: "ما الذي أطبقه اليوم من هذا الكتاب؟"</span></div>
+  <div class="highlight-green">تقرأ فكرة هنا ثم تطبقها مباشرة في الـ Deep Work بعدها</div>
+</div>
+
+<div class="block" data-block="4">
+  <div class="bhead"><span class="time t-blue">120 دقيقة (2 ساعات)</span><span class="btitle">Deep Work 1 — بناء MVP</span><span class="bsub">أصعب مهمة في اليوم</span></div>
+  <div class="row" data-task="t9"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">فطور خفيف قبل البدء إذا لم تأكل بعد</span></div>
+  <div class="row" data-task="t10"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">هاتف في غرفة أخرى — وضع عدم الإزعاج الكامل</span></div>
+  <div class="row" data-task="t11"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">مهمة واحدة فقط: كود، تصميم، أو حل مشكلة تقنية محددة</span></div>
+  <div class="row" data-task="t12"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">كل 50 دقيقة: 10 دقائق راحة — قف، تمدد، ماء (لا هاتف)</span></div>
+</div>
+
+<div class="block" data-block="5">
+  <div class="bhead"><span class="time t-amber">15 دقيقة</span><span class="btitle">استراحة قصيرة</span><span class="bsub">تبديل ذهني قبل التسويق</span></div>
+  <div class="row" data-task="t13"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">قف من الكرسي — تمدد أو مشي بسيط</span></div>
+  <div class="row" data-task="t14"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">ماء أو شاي خفيف — بلا هاتف، بلا تويتر</span></div>
+  <div class="row" data-task="t15"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">نفّس وأعد ترتيب ذهنك من "بناء" إلى "تسويق"</span></div>
+</div>
+
+<div class="block" data-block="6">
+  <div class="bhead"><span class="time t-purple">90 دقيقة</span><span class="btitle">Deep Work 2 — التسويق اليومي</span><span class="bsub">Twitter + Reddit + Outreach</span></div>
+  <div class="row" data-task="t16"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">4 tweets: buildlog + insight + question + CTA للـ waitlist — 25 دقيقة</span></div>
+  <div class="row" data-task="t17"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">100 reply على Twitter — 40 دقيقة</span></div>
+  <div class="row" data-task="t18"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">Reddit: منشور أو 10 تعليقات في r/SaaS, r/startups — مع رابط Waitlist في التعليق الأول أو الرد عند السؤال المناسب — 15 دقيقة</span></div>
+  <div class="row" data-task="t19"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">10 رسائل Warm Outreach — 10 دقائق</span></div>
+  <div class="highlight">قاعدة لا تُكسر: كل منشور "build in public" ينتهي بسطر CTA واضح + رابط Waitlist في التعليق الأول</div>
+</div>
+
+<div class="block" data-block="7">
+  <div class="bhead"><span class="time t-amber">120 دقيقة</span><span class="btitle">استراحة الظهر</span><span class="bsub">غداء + قيلولة</span></div>
+  <div class="row" data-task="t20"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">صلاة الظهر</span></div>
+  <div class="row" data-task="t21"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">غداء مريح بعيداً عن الشاشات — 40 دقيقة</span></div>
+  <div class="row" data-task="t22"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">قيلولة 20 دقيقة فقط — تشحن الطاقة للفترة الثانية</span></div>
+</div>
+
+<div class="block" data-block="8">
+  <div class="bhead"><span class="time t-teal">60 دقيقة</span><span class="btitle">Deep Work 3 — Instagram</span><span class="bsub">Reels + تفاعل</span></div>
+  <div class="row" data-task="t23"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">صلاة العصر</span></div>
+  <div class="row" data-task="t24"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">تصوير أو مونتاج Reel (batch أسبوعي يوم واحد أفضل) — 35 دقيقة</span></div>
+  <div class="row" data-task="t25"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">نشر + تفاعل مع التعليقات على المنشورات السابقة — 25 دقيقة</span></div>
+  <div class="highlight-green">كل Reel ينتهي بنص على الشاشة "الرابط في البايو" + سطر في الكابشن + رابط في أول تعليق</div>
+</div>
+
+<div class="block" data-block="9">
+  <div class="bhead"><span class="time t-amber">90 دقيقة</span><span class="btitle">وقت حر — ممنوع العمل</span><span class="bsub">راحة حقيقية</span></div>
+  <div class="row" data-task="t26"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">خروج، رياضة، عائلة، أصدقاء — بلا ذنب وبلا هاتف عمل</span></div>
+  <div class="row" data-task="t27"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">صلاة المغرب</span></div>
+</div>
+
+<div class="block" data-block="10">
+  <div class="bhead"><span class="time t-blue">90 دقيقة</span><span class="btitle">تخطيط الغد + إغلاق اليوم</span><span class="bsub">مراجعة + تنظيم</span></div>
+  <div class="row" data-task="t28"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">صلاة العشاء</span></div>
+  <div class="row" data-task="t29"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">3 أشياء: ماذا أنجزت؟ ما الأهم غداً؟ أي عقبة تحتاج حل؟</span></div>
+  <div class="row" data-task="t30"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">اكتب المهمة الواحدة الأهم للغد على ورقة — تضعها أمامك</span></div>
+</div>
+
+<div class="block" data-block="11">
+  <div class="bhead"><span class="time t-red">حتى 23:00</span><span class="btitle">هدوء ما قبل النوم</span><span class="bsub">لا شاشات</span></div>
+  <div class="row" data-task="t31"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">لا هاتف، لا تويتر، لا عمل بعد هذه النقطة</span></div>
+  <div class="row" data-task="t32"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">قراءة خفيفة أو حديث مع العائلة</span></div>
+  <div class="row" data-task="t33"><div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><span class="label">النوم 23:00 بالضبط ← استيقاظ 8:00 ← 9 ساعات كاملة</span></div>
+</div>
+
+<div class="close-block">
+  <div class="close-title">🔒 إغلاق اليوم</div>
+  <div class="close-msg" id="closeMsg">لسه ما بداش — علّم على المهام وأنت تنجزها طوال اليوم.</div>
+  <div class="fail-rule">قاعدة "اليوم الناقص": لو بقيت مهمة أو مهمتين قبل النوم، أكملها فوراً ولا تتركها (إلا الصلاة والنوم). يوم ناقص واحد لا يهدم شيئاً — التكرار هو ما يهدم الـ8 أسابيع، لا اليوم الواحد.</div>
+</div>
+
+<div class="reset-note">⏳ كل المهام تُصفَّر تلقائياً عند بداية يوم جديد — بدون أي زر تضغطه</div>
+
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'daily_system_state_v1';
+  var rows = document.querySelectorAll('.row[data-task]');
+  var total = rows.length;
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function todayLabel(){
+    var d = new Date();
+    var days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    return days[d.getDay()] + ' · ' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+  }
+
+  function loadStore(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveStore(store){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }catch(e){}
+  }
+
+  // store shape: { date: 'YYYY-MM-DD', tasks: {t1:true,...} }
+  var store = loadStore();
+  var tk = todayKey();
+  if(store.date !== tk){
+    // يوم جديد -> reset تلقائي كامل، بدون أي تدخل من المستخدم
+    store = { date: tk, tasks: {} };
+    saveStore(store);
+  }
+
+  document.getElementById('todayDate').textContent = todayLabel();
+
+  function updateProgress(){
+    var doneCount = 0;
+    rows.forEach(function(r){
+      if(store.tasks[r.getAttribute('data-task')]) doneCount++;
+    });
+    document.getElementById('progressCount').textContent = doneCount + ' / ' + total + ' مهمة';
+    var pct = total ? Math.round((doneCount/total)*100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+
+    var msg = document.getElementById('closeMsg');
+    if(doneCount === 0){
+      msg.textContent = 'لسه ما بداش — علّم على المهام وأنت تنجزها طوال اليوم.';
+    } else if(doneCount === total){
+      msg.textContent = '✅ أنهيت كل مهام اليوم — هذا هو الهدف بالضبط.';
+    } else {
+      msg.textContent = 'باقي ' + (total - doneCount) + ' مهمة فقط — كمّل قبل النوم.';
+    }
+
+    document.querySelectorAll('.block[data-block]').forEach(function(block){
+      var blockRows = block.querySelectorAll('.row[data-task]');
+      var allDone = blockRows.length > 0 && Array.prototype.every.call(blockRows, function(r){
+        return !!store.tasks[r.getAttribute('data-task')];
+      });
+      block.classList.toggle('done', allDone);
+    });
+  }
+
+  function applyState(){
+    rows.forEach(function(r){
+      var id = r.getAttribute('data-task');
+      r.classList.toggle('checked', !!store.tasks[id]);
+    });
+    updateProgress();
+  }
+
+  rows.forEach(function(r){
+    r.addEventListener('click', function(){
+      var id = r.getAttribute('data-task');
+      store.tasks[id] = !store.tasks[id];
+      saveStore(store);
+      r.classList.toggle('checked', !!store.tasks[id]);
+      updateProgress();
+    });
+  });
+
+  // إعادة فحص اليوم عند رجوع المستخدم للتطبيق (لو فتحه بعد منتصف الليل من جلسة سابقة)
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible'){
+      var freshTk = todayKey();
+      if(store.date !== freshTk){
+        store = { date: freshTk, tasks: {} };
+        saveStore(store);
+        document.getElementById('todayDate').textContent = todayLabel();
+        applyState();
+      }
+    }
+  });
+
+  applyState();
+
+  // ---------- PWA: manifest + service worker مضمّنين كـ Blob ----------
+  try{
+    var manifest = {
+      name: "نظامي اليومي",
+      short_name: "نظامي",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#EFEFF2",
+      theme_color: "#1D9E75",
+      icons: [
+        { src: makeIconDataUrl(192), sizes: "192x192", type: "image/png" },
+        { src: makeIconDataUrl(512), sizes: "512x512", type: "image/png" }
+      ]
+    };
+    var manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    document.getElementById('manifestLink').href = URL.createObjectURL(manifestBlob);
+    document.getElementById('appleIcon').href = makeIconDataUrl(180);
+  }catch(e){}
+
+  function makeIconDataUrl(size){
+    var canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1D9E75';
+    ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold ' + Math.round(size*0.45) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✓', size/2, size/2 + size*0.04);
+    return canvas.toDataURL('image/png');
+  }
+
+  if('serviceWorker' in navigator){
+    try{
+      var swCode = "self.addEventListener('install', function(e){ self.skipWaiting(); });" +
+                   "self.addEventListener('activate', function(e){ self.clients.claim(); });" +
+                   "self.addEventListener('fetch', function(e){ });";
+      var swBlob = new Blob([swCode], {type:'application/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+    }catch(e){}
+  }
+
+  // ---------- Install banner (Android/Chrome) ----------
+  var deferredPrompt = null;
+  var banner = document.getElementById('installBanner');
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    if(!isStandalone) banner.classList.add('show');
+  });
+
+  document.getElementById('installBtn').addEventListener('click', function(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){ banner.classList.remove('show'); });
+    }
+  });
+  document.getElementById('installClose').addEventListener('click', function(){
+    banner.classList.remove('show');
+  });
+
+  if(isIOS && !isStandalone){
+    document.getElementById('installText').textContent = '📲 لإضافة هذا كتطبيق: اضغط زر المشاركة ⬆️ ثم "إضافة إلى الشاشة الرئيسية"';
+    document.getElementById('installBtn').style.display = 'none';
+    banner.classList.add('show');
+  }
+})();
+</script>
+
+</body>
+</html>
